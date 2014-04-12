@@ -26,15 +26,7 @@
 
 using namespace std;
 
-static bool   g_initFailed = false;
-
-typedef struct
-{
-  uint32      m_homeId;
-  uint8      m_nodeId;
-  bool      m_polled;
-  list<OpenZWave::ValueID>  m_values;
-}NodeInfo;
+static bool g_initFailed = false;
 
 void CreateManager();
 void CleanUp();
