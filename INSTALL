@@ -1,0 +1,30 @@
+Some steps for installing:
+* First, make and install the openzwave library:
+    http://code.google.com/p/open-zwave/source/checkout
+
+  Also do a make install to create the shared library.
+  (in my case, it was installed in /usr/local/lib64)
+
+  libudev-dev
+  Compilation went OK, but when running the application,
+  I got an error about not finding the shared library.
+  To fix that, add a file containing the path to the
+  installation directory, in my case:
+
+    /usr/local/lib64
+
+  to /etc/ld.so.conf.d and run
+
+    sudo ldconfig
+
+  In my case, I checked out the zwave source in
+  ../open-zwave-read-only. If you put it somewhere else,
+  you should change it in the Makefile.
+
+* Don't forget to include boost:
+  - Download 1_55_0 (the .tar.gz version, I could not get
+    the GitHub version to work), place it in the project
+    dir and build it (./b2 etc.).
+    If you don't name the boost directory 'boost_1_55_0',
+    you'll probably have to change the Makefile.
+
