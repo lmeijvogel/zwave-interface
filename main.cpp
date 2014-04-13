@@ -113,6 +113,21 @@ void parseCommand(std::string input) {
     }
     pthread_mutex_unlock( &g_criticalSection );
   }
+  else if (sscanf(input.c_str(), "refresh %i\n", &nodeId) == 1) {
+    NodeInfo *nodeInfo = MyZWave::MyNode::FindNodeById(nodeId);
+
+    if (!nodeInfo || !nodeInfo->m_nodeId) {
+      NodeUnknownMessage(nodeId);
+      return;
+    }
+
+    OpenZWave::Manager::Get()->TestNetworkNode(MyZWave::g_homeId, nodeId, 5);
+    OpenZWave::Manager::Get()->RefreshNodeInfo(MyZWave::g_homeId, nodeId);
+    string message = (boost::format("OK: Refreshing node %i\n") % (int)nodeId).str();
+    socketReader->WriteLine(message);
+
+  }
+
   else {
     std::string message = "Unknown command!\n";
 
