@@ -24,6 +24,7 @@
 #include "Common.h"
 #include "SocketReader.h"
 #include "MyNode.h"
+#include "boost/format.hpp"
 
 using namespace std;
 
@@ -32,6 +33,8 @@ static bool g_initFailed = false;
 void CreateManager();
 void CleanUp();
 void SignalReceived(int signal);
+void NodeUnknownMessage(int nodeId);
+
 
 list<NodeInfo*> MyZWave::MyNode::nodes;
 
@@ -68,29 +71,26 @@ NodeInfo* GetNodeInfo
 void parseCommand(std::string input) {
   int nodeId, classId, index, level;
 
-  printf("RAW: %s\n", input.c_str());
   if (sscanf(input.c_str(), "set %i 0x%x %i %i\n", &nodeId, &classId, &index, &level) == 4) {
-    printf("Received %i, 0x%x, 0x%x, %i\n", nodeId, classId, index, level);
     NodeInfo *nodeInfo = MyZWave::MyNode::FindNodeById(nodeId);
 
-    if (!nodeInfo) {
-      printf("!!! Did not find node %i\n", nodeId);
-      return;
-    }
-
-    if (!nodeInfo->m_nodeId) {
-      printf("Node unknown!\n");
+    if (!nodeInfo || !nodeInfo->m_nodeId) {
+      NodeUnknownMessage(nodeId);
       return;
     }
 
     pthread_mutex_lock( &g_criticalSection );
 
+    string result;
     if (MyZWave::MyNode::SetValue(nodeInfo, classId, index, level)) {
-      printf("Success!\n");
-    } else {
-      // This can e.g. occur when newLevel is not a byte but the valuetype is.
-      printf("\n\n!!!! COULD NOT SET VALUE !!!!\n\n");
+      result = (boost::format("OK: %i 0x%x %i %i\n") % (int)nodeId % (int)classId % (int)index % (int)level).str();
     }
+    else
+    {
+      result = (boost::format("ERROR: %i 0x%x %i %i\n") % (int)nodeId % (int)classId % (int)index % (int)level).str();
+    }
+
+    socketReader->WriteLine(result);
 
     // but NodeInfo list and similar data should be inside critical section
     pthread_mutex_unlock( &g_criticalSection );
@@ -98,6 +98,11 @@ void parseCommand(std::string input) {
   else if (sscanf(input.c_str(), "get %i 0x%x %i\n", &nodeId, &classId, &index) == 3) {
     uint8 value;
     NodeInfo *nodeInfo = MyZWave::MyNode::FindNodeById(nodeId);
+
+    if (!nodeInfo || !nodeInfo->m_nodeId) {
+      NodeUnknownMessage(nodeId);
+      return;
+    }
 
     pthread_mutex_lock( &g_criticalSection );
 
@@ -392,4 +397,9 @@ void CleanUp() {
 
   delete socketReader;
   exit(0);
+}
+
+void NodeUnknownMessage(int nodeId) {
+  string message = (boost::format("ERROR: Node %i unknown\n") % (int)nodeId).str();
+  socketReader->WriteLine(message);
 }
