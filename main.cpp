@@ -23,6 +23,7 @@
 #include "Log.h"
 #include "Common.h"
 #include "SocketReader.h"
+#include "MyNode.h"
 
 using namespace std;
 
@@ -31,11 +32,9 @@ static bool g_initFailed = false;
 void CreateManager();
 void CleanUp();
 void SignalReceived(int signal);
-NodeInfo *FindNodeById(uint8 id);
-bool SetValue(NodeInfo *nodeInfo, uint8 classId, uint8 index, uint8 value);
-void PrintValueID(OpenZWave::ValueID v);
 
-static list<NodeInfo*> g_nodes;
+list<NodeInfo*> MyZWave::MyNode::nodes;
+
 static pthread_mutex_t g_criticalSection;
 static pthread_cond_t  initCond  = PTHREAD_COND_INITIALIZER;
 static pthread_mutex_t initMutex = PTHREAD_MUTEX_INITIALIZER;
@@ -54,7 +53,7 @@ NodeInfo* GetNodeInfo
 {
   uint32 const homeId = _notification->GetHomeId();
   uint8 const nodeId = _notification->GetNodeId();
-  for( list<NodeInfo*>::iterator it = g_nodes.begin(); it != g_nodes.end(); ++it )
+  for( list<NodeInfo*>::iterator it = MyZWave::MyNode::nodes.begin(); it != MyZWave::MyNode::nodes.end(); ++it )
   {
     NodeInfo* nodeInfo = *it;
     if( ( nodeInfo->m_homeId == homeId ) && ( nodeInfo->m_nodeId == nodeId ) )
@@ -72,7 +71,7 @@ void parseCommand(std::string input) {
   printf("RAW: %s\n", input.c_str());
   if (sscanf(input.c_str(), "%i 0x%x 0x%x %i\n", &nodeId, &classId, &index, &level) == 4) {
     printf("Received %i, 0x%x, 0x%x, %i\n", nodeId, classId, index, level);
-    NodeInfo *nodeInfo = FindNodeById(nodeId);
+    NodeInfo *nodeInfo = MyZWave::MyNode::FindNodeById(nodeId);
 
     if (!nodeInfo) {
       printf("!!! Did not find node %i\n", nodeId);
@@ -86,7 +85,7 @@ void parseCommand(std::string input) {
 
     pthread_mutex_lock( &g_criticalSection );
 
-    if (SetValue(nodeInfo, classId, index, level)) {
+    if (MyZWave::MyNode::SetValue(nodeInfo, classId, index, level)) {
       printf("Success!\n");
     } else {
       // This can e.g. occur when newLevel is not a byte but the valuetype is.
@@ -167,7 +166,7 @@ void OnNotification
       nodeInfo->m_homeId = _notification->GetHomeId();
       nodeInfo->m_nodeId = _notification->GetNodeId();
       nodeInfo->m_polled = false;
-      g_nodes.push_back( nodeInfo );
+      MyZWave::MyNode::nodes.push_back( nodeInfo );
       break;
     }
 
@@ -176,12 +175,12 @@ void OnNotification
       // Remove the node from our list
       uint32 const homeId = _notification->GetHomeId();
       uint8 const nodeId = _notification->GetNodeId();
-      for( list<NodeInfo*>::iterator it = g_nodes.begin(); it != g_nodes.end(); ++it )
+      for( list<NodeInfo*>::iterator it = MyZWave::MyNode::nodes.begin(); it != MyZWave::MyNode::nodes.end(); ++it )
       {
         NodeInfo* nodeInfo = *it;
         if( ( nodeInfo->m_homeId == homeId ) && ( nodeInfo->m_nodeId == nodeId ) )
         {
-          g_nodes.erase( it );
+          MyZWave::MyNode::nodes.erase( it );
           delete nodeInfo;
           break;
         }
@@ -375,32 +374,4 @@ void CleanUp() {
 
   delete socketReader;
   exit(0);
-}
-
-NodeInfo *FindNodeById(uint8 id) {
-  for( list<NodeInfo*>::iterator it = g_nodes.begin(); it != g_nodes.end(); ++it )
-  {
-    NodeInfo* nodeInfo = *it;
-
-    // skip the controller (most likely node 1)
-    if( nodeInfo->m_nodeId == 1) continue;
-    if( nodeInfo->m_nodeId == id) {
-      return nodeInfo;
-    }
-  }
-
-  return NULL;
-}
-
-bool SetValue(NodeInfo *nodeInfo, uint8 classId, uint8 index, uint8 value) {
-  for( list<OpenZWave::ValueID>::iterator it2 = nodeInfo->m_values.begin(); it2 != nodeInfo->m_values.end(); ++it2 )
-  {
-    OpenZWave::ValueID v = *it2;
-    if (v.GetCommandClassId() == classId && v.GetIndex() == index) {
-      printf("SetValue: (0x%x, 0x%x)\n", v.GetCommandClassId(), v.GetIndex());
-      OpenZWave::Manager::Get()->SetValue(v, value);
-      return true;
-    }
-  }
-  return false;
 }
