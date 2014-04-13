@@ -33,13 +33,14 @@ void CleanUp();
 void SignalReceived(int signal);
 NodeInfo *FindNodeById(uint8 id);
 bool SetValue(NodeInfo *nodeInfo, uint8 classId, uint8 index, uint8 value);
+void PrintValueID(OpenZWave::ValueID v);
 
 static list<NodeInfo*> g_nodes;
 static pthread_mutex_t g_criticalSection;
 static pthread_cond_t  initCond  = PTHREAD_COND_INITIALIZER;
 static pthread_mutex_t initMutex = PTHREAD_MUTEX_INITIALIZER;
 
-MyZWave::SocketReader *socket_reader = new MyZWave::SocketReader(2014);
+MyZWave::SocketReader *socketReader = new MyZWave::SocketReader(2014);
 
 uint32 MyZWave::g_homeId;
 //-----------------------------------------------------------------------------
@@ -319,7 +320,7 @@ int main( int argc, char* argv[] )
     // threads, and we cannot risk the list being changed while we are using it.
     // We must hold the critical section for as short a time as possible, to avoid
     // stalling the OpenZWave drivers.
-    socket_reader->listen(&parseCommand);
+    socketReader->listen(&parseCommand);
 
     // Sleep a bit more to make sure that any messages will be sent
     sleep(1);
@@ -355,8 +356,8 @@ void CreateManager() {
 }
 
 void SignalReceived(int signal) {
-  printf("Stopping socket_reader\n");
-  socket_reader->stop();
+  printf("Stopping socketReader\n");
+  socketReader->stop();
 }
 
 void CleanUp() {
@@ -372,7 +373,7 @@ void CleanUp() {
   OpenZWave::Options::Destroy();
   pthread_mutex_destroy( &g_criticalSection );
 
-  delete socket_reader;
+  delete socketReader;
   exit(0);
 }
 
