@@ -69,7 +69,7 @@ void parseCommand(std::string input) {
   int nodeId, classId, index, level;
 
   printf("RAW: %s\n", input.c_str());
-  if (sscanf(input.c_str(), "%i 0x%x 0x%x %i\n", &nodeId, &classId, &index, &level) == 4) {
+  if (sscanf(input.c_str(), "set %i 0x%x %i %i\n", &nodeId, &classId, &index, &level) == 4) {
     printf("Received %i, 0x%x, 0x%x, %i\n", nodeId, classId, index, level);
     NodeInfo *nodeInfo = MyZWave::MyNode::FindNodeById(nodeId);
 
