@@ -15,6 +15,7 @@ namespace MyZWave {
       SocketReader(int port);
 
       int listen( void (*resultHandler)(std::string input));
+      void WriteLine(std::string &line);
       void stop();
 
     private:

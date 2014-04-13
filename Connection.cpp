@@ -11,10 +11,14 @@ namespace MyZWave {
     boost::asio::read_until(socket_, buffer, '\n', error);
   }
 
+  void Connection::WriteLine(std::string &line) {
+    long int length = line.length();
+    boost::asio::write(socket_, boost::asio::buffer(line, length));
+  }
+
   void Connection::Close() {
     boost::system::error_code ec;
     socket_.shutdown(tcp::socket::shutdown_both, ec);
     socket_.close();
   }
-
 };

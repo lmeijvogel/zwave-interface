@@ -95,6 +95,24 @@ void parseCommand(std::string input) {
     // but NodeInfo list and similar data should be inside critical section
     pthread_mutex_unlock( &g_criticalSection );
   }
+  else if (sscanf(input.c_str(), "get %i 0x%x %i\n", &nodeId, &classId, &index) == 3) {
+    uint8 value;
+    NodeInfo *nodeInfo = MyZWave::MyNode::FindNodeById(nodeId);
+
+    pthread_mutex_lock( &g_criticalSection );
+
+    if (MyZWave::MyNode::GetValue(nodeInfo, classId, index, &value)) {
+      std::string result = (boost::format("%i 0x%x %i: %i\n") % (int)nodeId % (int)classId % (int)index % (int)value).str();
+
+      socketReader->WriteLine(result);
+    }
+    pthread_mutex_unlock( &g_criticalSection );
+  }
+  else {
+    std::string message = "Unknown command!\n";
+
+    socketReader->WriteLine(message);
+  }
 }
 
 //-----------------------------------------------------------------------------

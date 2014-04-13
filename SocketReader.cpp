@@ -70,6 +70,10 @@ namespace MyZWave {
     return 0;
   }
 
+  void SocketReader::WriteLine(std::string &line) {
+    connection_->WriteLine(line);
+  }
+
   void SocketReader::stop() {
     acceptor_.close();
 
