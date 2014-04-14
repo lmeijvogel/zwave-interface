@@ -22,7 +22,7 @@
 #include "ValueBool.h"
 #include "Log.h"
 #include "Common.h"
-#include "SocketReader.h"
+#include "TelnetServer.h"
 #include "MyNode.h"
 #include "boost/format.hpp"
 
@@ -35,14 +35,13 @@ void CleanUp();
 void SignalReceived(int signal);
 void NodeUnknownMessage(int nodeId);
 
-
 list<NodeInfo*> MyZWave::MyNode::nodes;
 
 static pthread_mutex_t g_criticalSection;
 static pthread_cond_t  initCond  = PTHREAD_COND_INITIALIZER;
 static pthread_mutex_t initMutex = PTHREAD_MUTEX_INITIALIZER;
 
-MyZWave::SocketReader *socketReader = new MyZWave::SocketReader(2014);
+MyZWave::TelnetServer telnetServer(2014);
 
 uint32 MyZWave::g_homeId;
 //-----------------------------------------------------------------------------
@@ -90,7 +89,7 @@ void parseCommand(std::string input) {
       result = (boost::format("ERROR: %i 0x%x %i %i\n") % (int)nodeId % (int)classId % (int)index % (int)level).str();
     }
 
-    socketReader->WriteLine(result);
+    telnetServer.WriteLine(result);
 
     // but NodeInfo list and similar data should be inside critical section
     pthread_mutex_unlock( &g_criticalSection );
@@ -109,7 +108,7 @@ void parseCommand(std::string input) {
     if (MyZWave::MyNode::GetValue(nodeInfo, classId, index, &value)) {
       std::string result = (boost::format("%i 0x%x %i: %i\n") % (int)nodeId % (int)classId % (int)index % (int)value).str();
 
-      socketReader->WriteLine(result);
+      telnetServer.WriteLine(result);
     }
     pthread_mutex_unlock( &g_criticalSection );
   }
@@ -124,14 +123,14 @@ void parseCommand(std::string input) {
     OpenZWave::Manager::Get()->TestNetworkNode(MyZWave::g_homeId, nodeId, 5);
     OpenZWave::Manager::Get()->RefreshNodeInfo(MyZWave::g_homeId, nodeId);
     string message = (boost::format("OK: Refreshing node %i\n") % (int)nodeId).str();
-    socketReader->WriteLine(message);
+    telnetServer.WriteLine(message);
 
   }
 
   else {
     std::string message = "Unknown command!\n";
 
-    socketReader->WriteLine(message);
+    telnetServer.WriteLine(message);
   }
 }
 
@@ -357,7 +356,7 @@ int main( int argc, char* argv[] )
     // threads, and we cannot risk the list being changed while we are using it.
     // We must hold the critical section for as short a time as possible, to avoid
     // stalling the OpenZWave drivers.
-    socketReader->listen(&parseCommand);
+    telnetServer.listen(&parseCommand);
 
     // Sleep a bit more to make sure that any messages will be sent
     sleep(1);
@@ -393,8 +392,7 @@ void CreateManager() {
 }
 
 void SignalReceived(int signal) {
-  printf("Stopping socketReader\n");
-  socketReader->stop();
+  telnetServer.Stop();
 }
 
 void CleanUp() {
@@ -410,11 +408,10 @@ void CleanUp() {
   OpenZWave::Options::Destroy();
   pthread_mutex_destroy( &g_criticalSection );
 
-  delete socketReader;
   exit(0);
 }
 
 void NodeUnknownMessage(int nodeId) {
   string message = (boost::format("ERROR: Node %i unknown\n") % (int)nodeId).str();
-  socketReader->WriteLine(message);
+  telnetServer.WriteLine(message);
 }

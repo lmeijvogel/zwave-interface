@@ -8,7 +8,7 @@ ZWAVE_INCLUDES= -I ./lib -I $(ZWAVE_BASE_DIR)/cpp/src -I $(ZWAVE_BASE_DIR)/cpp/s
 	-I $(ZWAVE_BASE_DIR)/cpp/examples/ -I $(ZWAVE_BASE_DIR)/cpp/build/
 INCLUDES=$(ZWAVE_INCLUDES) $(BOOST_INCLUDES)
 
-all: main.o Common.o SocketReader.o Connection.o MyNode.o
+all: main.o Common.o TelnetServer.o MyNode.o
 	$(CC) $? -lopenzwave -l:/usr/local/include/libboost_system.so -o main
 
 Common.o: Common.cpp Common.h
@@ -17,10 +17,7 @@ Common.o: Common.cpp Common.h
 main.o: main.cpp
 	$(CC) $(CFLAGS) $< -lopenzwave $(INCLUDES)
 
-SocketReader.o: SocketReader.cpp SocketReader.h
-	$(CC) $(CFLAGS) $< -lboost_system $(INCLUDES)
-
-Connection.o: Connection.cpp Connection.h
+TelnetServer.o: TelnetServer.cpp TelnetServer.h
 	$(CC) $(CFLAGS) $< -lboost_system $(INCLUDES)
 
 MyNode.o: MyNode.cpp MyNode.h
