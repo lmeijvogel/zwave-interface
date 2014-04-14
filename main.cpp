@@ -23,8 +23,8 @@
 #include "Log.h"
 #include "Common.h"
 #include "TelnetServer.h"
+#include "CommandParser.h"
 #include "MyNode.h"
-#include "boost/format.hpp"
 
 using namespace std;
 
@@ -33,7 +33,6 @@ static bool g_initFailed = false;
 void CreateManager();
 void CleanUp();
 void SignalReceived(int signal);
-void NodeUnknownMessage(int nodeId);
 
 list<NodeInfo*> MyZWave::MyNode::nodes;
 
@@ -42,6 +41,7 @@ static pthread_cond_t  initCond  = PTHREAD_COND_INITIALIZER;
 static pthread_mutex_t initMutex = PTHREAD_MUTEX_INITIALIZER;
 
 MyZWave::TelnetServer telnetServer(2014);
+MyZWave::CommandParser commandParser(telnetServer);
 
 uint32 MyZWave::g_homeId;
 //-----------------------------------------------------------------------------
@@ -68,70 +68,11 @@ NodeInfo* GetNodeInfo
 }
 
 void parseCommand(std::string input) {
-  int nodeId, classId, index, level;
+  pthread_mutex_lock( &g_criticalSection );
 
-  if (sscanf(input.c_str(), "set %i 0x%x %i %i\n", &nodeId, &classId, &index, &level) == 4) {
-    NodeInfo *nodeInfo = MyZWave::MyNode::FindNodeById(nodeId);
+  commandParser.ParseCommand(input);
 
-    if (!nodeInfo || !nodeInfo->m_nodeId) {
-      NodeUnknownMessage(nodeId);
-      return;
-    }
-
-    pthread_mutex_lock( &g_criticalSection );
-
-    string result;
-    if (MyZWave::MyNode::SetValue(nodeInfo, classId, index, level)) {
-      result = (boost::format("OK: %i 0x%x %i %i\n") % (int)nodeId % (int)classId % (int)index % (int)level).str();
-    }
-    else
-    {
-      result = (boost::format("ERROR: %i 0x%x %i %i\n") % (int)nodeId % (int)classId % (int)index % (int)level).str();
-    }
-
-    telnetServer.WriteLine(result);
-
-    // but NodeInfo list and similar data should be inside critical section
-    pthread_mutex_unlock( &g_criticalSection );
-  }
-  else if (sscanf(input.c_str(), "get %i 0x%x %i\n", &nodeId, &classId, &index) == 3) {
-    uint8 value;
-    NodeInfo *nodeInfo = MyZWave::MyNode::FindNodeById(nodeId);
-
-    if (!nodeInfo || !nodeInfo->m_nodeId) {
-      NodeUnknownMessage(nodeId);
-      return;
-    }
-
-    pthread_mutex_lock( &g_criticalSection );
-
-    if (MyZWave::MyNode::GetValue(nodeInfo, classId, index, &value)) {
-      std::string result = (boost::format("%i 0x%x %i: %i\n") % (int)nodeId % (int)classId % (int)index % (int)value).str();
-
-      telnetServer.WriteLine(result);
-    }
-    pthread_mutex_unlock( &g_criticalSection );
-  }
-  else if (sscanf(input.c_str(), "refresh %i\n", &nodeId) == 1) {
-    NodeInfo *nodeInfo = MyZWave::MyNode::FindNodeById(nodeId);
-
-    if (!nodeInfo || !nodeInfo->m_nodeId) {
-      NodeUnknownMessage(nodeId);
-      return;
-    }
-
-    OpenZWave::Manager::Get()->TestNetworkNode(MyZWave::g_homeId, nodeId, 5);
-    OpenZWave::Manager::Get()->RefreshNodeInfo(MyZWave::g_homeId, nodeId);
-    string message = (boost::format("OK: Refreshing node %i\n") % (int)nodeId).str();
-    telnetServer.WriteLine(message);
-
-  }
-
-  else {
-    std::string message = "Unknown command!\n";
-
-    telnetServer.WriteLine(message);
-  }
+  pthread_mutex_unlock( &g_criticalSection );
 }
 
 //-----------------------------------------------------------------------------
@@ -409,9 +350,4 @@ void CleanUp() {
   pthread_mutex_destroy( &g_criticalSection );
 
   exit(0);
-}
-
-void NodeUnknownMessage(int nodeId) {
-  string message = (boost::format("ERROR: Node %i unknown\n") % (int)nodeId).str();
-  telnetServer.WriteLine(message);
 }
