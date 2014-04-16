@@ -25,6 +25,7 @@
 #include "TelnetServer.h"
 #include "CommandParser.h"
 #include "MyNode.h"
+#include "EventProcessor.h"
 
 using namespace std;
 
@@ -42,7 +43,7 @@ static pthread_mutex_t initMutex = PTHREAD_MUTEX_INITIALIZER;
 
 MyZWave::TelnetServer telnetServer(2014);
 MyZWave::CommandParser commandParser(telnetServer);
-
+MyZWave::EventProcessor eventProcessor;
 uint32 MyZWave::g_homeId;
 //-----------------------------------------------------------------------------
 // <GetNodeInfo>
@@ -172,7 +173,9 @@ void OnNotification
       // basic_set or hail message.
       if( NodeInfo* nodeInfo = GetNodeInfo( _notification ) )
       {
-        nodeInfo = nodeInfo;    // placeholder for real action
+        uint8 event = _notification->GetEvent();
+
+        eventProcessor.ProcessEvent(nodeInfo, event);
       }
       break;
     }
