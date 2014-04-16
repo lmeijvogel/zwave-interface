@@ -31,11 +31,11 @@ namespace MyZWave {
 
       void TransitionTo(LightsState newState);
 
-      std::map<LightsState,LightsState> mainButtonOnTransitions;
+      std::map<LightsState,LightsState> masterSwitchOnTransitions;
       LightsState currentState;
 
       uint8 masterSwitchId;
-      uint8 onlyLightId;
+      uint8 myOnlyLightId;
   };
 }
 #endif

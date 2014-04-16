@@ -11,23 +11,11 @@ INCLUDES=$(ZWAVE_INCLUDES) $(BOOST_INCLUDES)
 all: main.o Common.o TelnetServer.o CommandParser.o EventProcessor.o MyNode.o
 	$(CC) $? -lopenzwave -l:/usr/local/include/libboost_system.so -o main
 
-Common.o: Common.cpp Common.h
-	$(CC) $(CFLAGS) $< -lopenzwave $(INCLUDES)
-
 main.o: main.cpp
 	$(CC) $(CFLAGS) $< -lopenzwave $(INCLUDES)
 
-TelnetServer.o: TelnetServer.cpp TelnetServer.h
-	$(CC) $(CFLAGS) $< -lboost_system $(INCLUDES)
-
-CommandParser.o: CommandParser.cpp CommandParser.h
-	$(CC) $(CFLAGS) $< -lboost_system $(INCLUDES)
-
-EventProcessor.o: EventProcessor.cpp EventProcessor.h
-	$(CC) $(CFLAGS) $< -lboost_system $(INCLUDES)
-
-MyNode.o: MyNode.cpp MyNode.h
-	$(CC) $(CFLAGS) $< -lboost_system $(INCLUDES)
+%.o: %.cpp %.h
+	$(CC) $(CFLAGS) $< -lopenzwave $(INCLUDES)
 
 clean:
 	rm -f main *.o *.h.gch

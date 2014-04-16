@@ -3,23 +3,25 @@
 
 /* Temporarily hardcode the state transitions and IDs.
  * I hope I'll be able to make them configurable.
+ *
+ * Don't do this via telnet, it will probably feel slower.
  */
 namespace MyZWave {
   EventProcessor::EventProcessor() {
     masterSwitchId = 3;
-    onlyLightId = 2;
+    myOnlyLightId = 2;
 
-    mainButtonOnTransitions[ Lights_Off           ] = Lights_Regular;
+    masterSwitchOnTransitions[ Lights_Off           ] = Lights_Regular;
 
-    mainButtonOnTransitions[ Lights_Morning       ] = Lights_Morning;
+    masterSwitchOnTransitions[ Lights_Morning       ] = Lights_Morning;
 
-    mainButtonOnTransitions[ Lights_Dimmed        ] = Lights_Regular;
-    mainButtonOnTransitions[ Lights_Regular       ] = Lights_Dimmed;
+    masterSwitchOnTransitions[ Lights_Dimmed        ] = Lights_Regular;
+    masterSwitchOnTransitions[ Lights_Regular       ] = Lights_Dimmed;
 
-    mainButtonOnTransitions[ Lights_Night         ] = Lights_Night;
+    masterSwitchOnTransitions[ Lights_Night         ] = Lights_Night;
 
-    mainButtonOnTransitions[ Lights_Uninitialized ] = Lights_Regular;
-    mainButtonOnTransitions[ Lights_Custom        ] = Lights_Regular;
+    masterSwitchOnTransitions[ Lights_Uninitialized ] = Lights_Regular;
+    masterSwitchOnTransitions[ Lights_Custom        ] = Lights_Regular;
   }
 
   void EventProcessor::ProcessEvent(NodeInfo *nodeInfo, uint8 event) {
@@ -39,7 +41,7 @@ namespace MyZWave {
     } else if (IsMorning()) {
       newState = Lights_Morning;
     } else {
-      newState = mainButtonOnTransitions[currentState];
+      newState = masterSwitchOnTransitions[currentState];
     }
 
     TransitionTo(newState);
@@ -71,7 +73,7 @@ namespace MyZWave {
 
   void EventProcessor::TransitionTo(LightsState newState) {
     // My only light. For now.
-    NodeInfo *light = MyZWave::MyNode::FindNodeById(onlyLightId);
+    NodeInfo *light = MyZWave::MyNode::FindNodeById(myOnlyLightId);
 
     uint8 intensity;
 
