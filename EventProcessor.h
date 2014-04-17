@@ -2,6 +2,7 @@
 #define EventProcessor_H_
 #include <stdlib.h>
 #include "Common.h"
+#include "LightsState.h"
 #include "Node.h"
 
 namespace MyZWave {
@@ -18,17 +19,6 @@ namespace MyZWave {
       bool IsMorning();
 
       int GetHour();
-      enum LightsState
-      {
-        Lights_Uninitialized = 0,
-        Lights_Off,
-        Lights_Morning,
-        Lights_Regular,
-        Lights_Dimmed,
-        Lights_Night,
-        Lights_Custom
-      };
-
       void TransitionTo(LightsState newState);
 
       std::map<LightsState,LightsState> masterSwitchOnTransitions;
