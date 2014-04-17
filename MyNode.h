@@ -1,3 +1,5 @@
+#ifndef MyNode_H_
+#define MyNode_H_
 #include <stdlib.h>
 
 #include "Common.h"
@@ -24,3 +26,4 @@ namespace MyZWave {
     static list<NodeInfo*> nodes;
   };
 }
+#endif
