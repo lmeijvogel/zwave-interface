@@ -21,6 +21,10 @@ namespace MyZWave {
   }
 
   bool MyNode::GetValue(NodeInfo *nodeInfo, uint8 classId, uint8 index, uint8 *value) {
+    if (nodeInfo == NULL) {
+      return false;
+    }
+
     for( list<OpenZWave::ValueID>::iterator it2 = nodeInfo->m_values.begin(); it2 != nodeInfo->m_values.end(); ++it2 )
     {
       OpenZWave::ValueID v = *it2;
@@ -34,6 +38,10 @@ namespace MyZWave {
   }
 
   bool MyNode::SetValue(NodeInfo *nodeInfo, uint8 classId, uint8 index, uint8 value) {
+    if (nodeInfo == NULL) {
+      return false;
+    }
+
     for( list<OpenZWave::ValueID>::iterator it2 = nodeInfo->m_values.begin(); it2 != nodeInfo->m_values.end(); ++it2 )
     {
       OpenZWave::ValueID v = *it2;
@@ -47,6 +55,11 @@ namespace MyZWave {
   }
 
   void MyNode::PrintNode(NodeInfo *nodeInfo) {
+    if (nodeInfo == NULL) {
+      printf("Unknown node!");
+      return;
+    }
+
     for( list<OpenZWave::ValueID>::iterator it2 = nodeInfo->m_values.begin(); it2 != nodeInfo->m_values.end(); ++it2 )
     {
       OpenZWave::ValueID v = *it2;
