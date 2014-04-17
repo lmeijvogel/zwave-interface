@@ -7,9 +7,10 @@
  * Don't do this via telnet, it will probably feel slower.
  */
 namespace MyZWave {
-  EventProcessor::EventProcessor() {
+  EventProcessor::EventProcessor(LightsController &lightsController) :
+    lightsController(lightsController)
+  {
     masterSwitchId = 3;
-    myOnlyLightId = 2;
 
     masterSwitchOnTransitions[ Lights_Off           ] = Lights_Regular;
 
@@ -72,21 +73,7 @@ namespace MyZWave {
   }
 
   void EventProcessor::TransitionTo(LightsState newState) {
-    // My only light. For now.
-    NodeInfo *light = MyZWave::MyNode::FindNodeById(myOnlyLightId);
-
-    uint8 intensity;
-
-    switch (newState) {
-      case Lights_Off:     intensity =  0; break;
-      case Lights_Morning: intensity = 80; break;
-      case Lights_Regular: intensity = 99; break;
-      case Lights_Dimmed:  intensity = 30; break;
-      case Lights_Night:   intensity = 10; break;
-      default:             intensity =  0; break;
-    }
-
-    MyZWave::MyNode::SetValue(light, 0x26, 0, intensity);
+    lightsController.SetProgramme(newState);
     currentState = newState;
   }
 }

@@ -2,13 +2,14 @@
 #define EventProcessor_H_
 #include <stdlib.h>
 #include "Common.h"
+#include "LightsController.h"
 #include "LightsState.h"
 #include "Node.h"
 
 namespace MyZWave {
   class EventProcessor {
     public:
-      EventProcessor();
+      EventProcessor(LightsController &lightsController);
       void ProcessEvent(NodeInfo *nodeInfo, uint8 event);
 
     private:
@@ -23,6 +24,8 @@ namespace MyZWave {
 
       std::map<LightsState,LightsState> masterSwitchOnTransitions;
       LightsState currentState;
+
+      LightsController &lightsController;
 
       uint8 masterSwitchId;
       uint8 myOnlyLightId;

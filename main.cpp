@@ -26,6 +26,7 @@
 #include "CommandParser.h"
 #include "MyNode.h"
 #include "EventProcessor.h"
+#include "LightsController.h"
 
 using namespace std;
 
@@ -43,7 +44,9 @@ static pthread_mutex_t initMutex = PTHREAD_MUTEX_INITIALIZER;
 
 MyZWave::TelnetServer telnetServer(2014);
 MyZWave::CommandParser commandParser(telnetServer);
-MyZWave::EventProcessor eventProcessor;
+MyZWave::LightsController lightsController;
+MyZWave::EventProcessor eventProcessor(lightsController);
+
 uint32 MyZWave::g_homeId;
 //-----------------------------------------------------------------------------
 // <GetNodeInfo>

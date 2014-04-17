@@ -8,7 +8,7 @@ ZWAVE_INCLUDES= -I $(ZWAVE_BASE_DIR)/cpp/src -I $(ZWAVE_BASE_DIR)/cpp/src/comman
 	-I $(ZWAVE_BASE_DIR)/cpp/examples/ -I $(ZWAVE_BASE_DIR)/cpp/build/
 INCLUDES=$(ZWAVE_INCLUDES) $(BOOST_INCLUDES)
 
-all: main.o Common.o TelnetServer.o CommandParser.o EventProcessor.o MyNode.o
+all: main.o Common.o TelnetServer.o CommandParser.o EventProcessor.o LightsController.o MyNode.o
 	$(CC) $? -lopenzwave -l:/usr/local/include/libboost_system.so -o main
 
 main.o: main.cpp
