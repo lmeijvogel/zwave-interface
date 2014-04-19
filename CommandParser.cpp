@@ -24,10 +24,19 @@ namespace MyZWave {
       }
 
       string result;
-      if (MyZWave::MyNode::SetValue(nodeInfo, classId, index, level)) {
-        result = (boost::format("OK: %i 0x%x %i %i\n") % (int)nodeId % (int)classId % (int)index % (int)level).str();
+      bool success = false;
+
+      if (classId == 0x25) { // switch, so boolean
+        if (success = MyZWave::MyNode::SetValue(nodeInfo, classId, index, (level != 0))) {
+          result = (boost::format("OK: %i 0x%x %i %i\n") % (int)nodeId % (int)classId % (int)index % (int)level).str();
+        }
+      } else {
+        if (success = MyZWave::MyNode::SetValue(nodeInfo, classId, index, level)) {
+          result = (boost::format("OK: %i 0x%x %i %i\n") % (int)nodeId % (int)classId % (int)index % (int)level).str();
+        }
       }
-      else
+
+      if (!success)
       {
         result = (boost::format("ERROR: %i 0x%x %i %i\n") % (int)nodeId % (int)classId % (int)index % (int)level).str();
       }

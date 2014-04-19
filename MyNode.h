@@ -19,6 +19,8 @@ namespace MyZWave {
 
     static bool GetValue(NodeInfo *nodeInfo, uint8 classId, uint8 index, uint8 *value);
     static bool SetValue(NodeInfo *nodeInfo, uint8 classId, uint8 index, uint8 value);
+    static bool SetValue(NodeInfo *nodeInfo, uint8 classId, uint8 index, int value);
+    static bool SetValue(NodeInfo *nodeInfo, uint8 classId, uint8 index, bool value);
 
     static void PrintNode(NodeInfo *nodeInfo);
     static void PrintValueID(OpenZWave::ValueID v);

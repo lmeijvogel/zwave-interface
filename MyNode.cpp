@@ -37,6 +37,27 @@ namespace MyZWave {
     return false;
   }
 
+  bool MyNode::SetValue(NodeInfo *nodeInfo, uint8 classId, uint8 index, bool value) {
+    if (nodeInfo == NULL) {
+      return false;
+    }
+
+    for( list<OpenZWave::ValueID>::iterator it2 = nodeInfo->m_values.begin(); it2 != nodeInfo->m_values.end(); ++it2 )
+    {
+      OpenZWave::ValueID v = *it2;
+      if (v.GetCommandClassId() == classId && v.GetIndex() == index) {
+        printf("SetValue: (0x%x, 0x%x)\n", v.GetCommandClassId(), v.GetIndex());
+        OpenZWave::Manager::Get()->SetValue(v, value);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  bool MyNode::SetValue(NodeInfo *nodeInfo, uint8 classId, uint8 index, int value) {
+    return SetValue(nodeInfo, classId, index, (uint8)value);
+  }
+
   bool MyNode::SetValue(NodeInfo *nodeInfo, uint8 classId, uint8 index, uint8 value) {
     if (nodeInfo == NULL) {
       return false;
