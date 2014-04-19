@@ -43,9 +43,9 @@ static pthread_cond_t  initCond  = PTHREAD_COND_INITIALIZER;
 static pthread_mutex_t initMutex = PTHREAD_MUTEX_INITIALIZER;
 
 MyZWave::TelnetServer telnetServer(2014);
-MyZWave::CommandParser commandParser(telnetServer);
 MyZWave::LightsController lightsController;
 MyZWave::EventProcessor eventProcessor(lightsController);
+MyZWave::CommandParser commandParser(telnetServer, lightsController);
 
 uint32 MyZWave::g_homeId;
 //-----------------------------------------------------------------------------

@@ -7,13 +7,20 @@
 #include "boost/format.hpp"
 
 namespace MyZWave {
-  CommandParser::CommandParser(TelnetServer &telnetServer) :
-    telnetServer_(telnetServer)
+  CommandParser::CommandParser(TelnetServer &telnetServer, LightsController &lightsController) :
+    telnetServer_(telnetServer),
+    lightsController_(lightsController)
   {
+    programmeTranslations_["off"] = Lights_Off;
+    programmeTranslations_["morning"] = Lights_Morning;
+    programmeTranslations_["regular"] = Lights_Regular;
+    programmeTranslations_["dimmed"] = Lights_Dimmed;
+    programmeTranslations_["night"] = Lights_Night;
   }
 
   void CommandParser::ParseCommand(std::string input) {
     int nodeId, classId, index, level;
+    char *programme;
 
     if (sscanf(input.c_str(), "set %i 0x%x %i %i\n", &nodeId, &classId, &index, &level) == 4) {
       NodeInfo *nodeInfo = MyZWave::MyNode::FindNodeById(nodeId);
@@ -73,7 +80,18 @@ namespace MyZWave {
       telnetServer_.WriteLine(message);
 
     }
+    else if (sscanf(input.c_str(), "programme %ms\n", &programme) == 1) {
+      LightsState state;
 
+      if (ParseProgramme(programme, &state)) {
+        lightsController_.SetProgramme(state);
+      } else {
+        string message = "Unknown programme!\n";
+        telnetServer_.WriteLine(message);
+      }
+
+      free(programme);
+    }
     else {
       std::string message = "Unknown command!\n";
 
@@ -84,5 +102,16 @@ namespace MyZWave {
   void CommandParser::NodeUnknownMessage(int nodeId) {
     string message = (boost::format("ERROR: Node %i unknown\n") % (int)nodeId).str();
     telnetServer_.WriteLine(message);
+  }
+
+  bool CommandParser::ParseProgramme(char *descriptor, LightsState *state) {
+    map<string,LightsState>::iterator it = programmeTranslations_.find(descriptor);
+
+    if (it != programmeTranslations_.end()) {
+      *state = it->second;
+      return true;
+    }
+
+    return false;
   }
 }
