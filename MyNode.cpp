@@ -116,6 +116,8 @@ namespace MyZWave {
     string label = manager->GetValueLabel(v);
     NodeInfo *nodeInfo = FindNodeById(v.GetNodeId());
 
+    string string_value;
+
     switch (v.GetType()) {
       case OpenZWave::ValueID::ValueType_Bool:
         bool bool_value;
@@ -158,8 +160,9 @@ namespace MyZWave {
         printf("%i(0x%x:%i): %s: %i\n", v.GetNodeId(), v.GetCommandClassId(), v.GetIndex(), label.c_str(), short_value);
         break;
       case OpenZWave::ValueID::ValueType_String:
-        // No support yet, does not seem necessary
-        printf("%i(0x%x:%i): %s: STRING\n", v.GetNodeId(), v.GetCommandClassId(), v.GetIndex(), label.c_str());
+        manager->GetValueAsString(v, &string_value);
+
+        printf("%i(0x%x:%i): %s: %s\n", v.GetNodeId(), v.GetCommandClassId(), v.GetIndex(), label.c_str(), string_value.c_str());
         break;
       case OpenZWave::ValueID::ValueType_Button:
         // No support yet, does not seem necessary
