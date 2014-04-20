@@ -34,11 +34,13 @@ namespace MyZWave {
       bool success = false;
 
       if (classId == 0x25) { // switch, so boolean
-        if (success = MyZWave::MyNode::SetValue(nodeInfo, classId, index, (level != 0))) {
+        success = MyZWave::MyNode::SetValue(nodeInfo, classId, index, (level != 0));
+        if (success) {
           result = (boost::format("OK: %i 0x%x %i %i\n") % (int)nodeId % (int)classId % (int)index % (int)level).str();
         }
       } else {
-        if (success = MyZWave::MyNode::SetValue(nodeInfo, classId, index, level)) {
+        success = MyZWave::MyNode::SetValue(nodeInfo, classId, index, level);
+        if (success) {
           result = (boost::format("OK: %i 0x%x %i %i\n") % (int)nodeId % (int)classId % (int)index % (int)level).str();
         }
       }
