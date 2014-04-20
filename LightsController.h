@@ -9,13 +9,15 @@ namespace MyZWave {
   class LightsController {
     public:
     LightsController();
+    ~LightsController();
+
     void SetProgramme( LightsState state );
 
     private:
-    uint8 uplightId;
-    uint8 coffeeTableId;
-    uint8 diningTableId;
-    uint8 kitchenId;
+    MyZWave::MyNode *uplight;
+    MyZWave::MyNode *coffeeTable;
+    MyZWave::MyNode *diningTable;
+    MyZWave::MyNode *kitchen;
   };
 }
 #endif

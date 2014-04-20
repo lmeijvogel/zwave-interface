@@ -14,6 +14,13 @@ using namespace std;
 namespace MyZWave {
   class MyNode {
     public:
+    MyNode(NodeInfo *nodeInfo);
+
+    bool GetValue(uint8 classId, uint8 index, uint8 *value);
+
+    bool SetValue(uint8 classId, uint8 index, int value);
+    bool SetValue(uint8 classId, uint8 index, uint8 value);
+    bool SetValue(uint8 classId, uint8 index, bool value);
 
     static NodeInfo *FindNodeById(uint8 id);
 
@@ -26,6 +33,9 @@ namespace MyZWave {
     static void PrintValueID(OpenZWave::ValueID v);
 
     static list<NodeInfo*> nodes;
+
+    private:
+    NodeInfo *nodeInfo_;
   };
 }
 #endif

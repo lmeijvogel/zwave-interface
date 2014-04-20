@@ -3,10 +3,27 @@
 
 namespace MyZWave {
   LightsController::LightsController() {
-    uplightId     = 2;
-    coffeeTableId = 4;
-    diningTableId = 5;
-    kitchenId     = 7;
+    uint8 uplightId     = 2;
+    uint8 coffeeTableId = 4;
+    uint8 diningTableId = 5;
+    uint8 kitchenId     = 7;
+
+    NodeInfo *uplightNi     = MyZWave::MyNode::FindNodeById(uplightId);
+    NodeInfo *coffeeTableNi = MyZWave::MyNode::FindNodeById(coffeeTableId);
+    NodeInfo *diningTableNi = MyZWave::MyNode::FindNodeById(diningTableId);
+    NodeInfo *kitchenNi     = MyZWave::MyNode::FindNodeById(kitchenId);
+
+    uplight     = new MyZWave::MyNode(uplightNi);
+    coffeeTable = new MyZWave::MyNode(coffeeTableNi);
+    diningTable = new MyZWave::MyNode(diningTableNi);
+    kitchen     = new MyZWave::MyNode(kitchenNi);
+  }
+
+  LightsController::~LightsController() {
+    delete uplight;
+    delete coffeeTable;
+    delete diningTable;
+    delete kitchen;
   }
 
   void LightsController::SetProgramme( LightsState state ) {
@@ -46,14 +63,9 @@ namespace MyZWave {
       break;
     }
 
-    NodeInfo *uplight     = MyZWave::MyNode::FindNodeById(uplightId);
-    NodeInfo *coffeeTable = MyZWave::MyNode::FindNodeById(coffeeTableId);
-    NodeInfo *diningTable = MyZWave::MyNode::FindNodeById(diningTableId);
-    NodeInfo *kitchen     = MyZWave::MyNode::FindNodeById(kitchenId);
-
-    MyZWave::MyNode::SetValue(uplight,     0x26, 0, uplightIntensity);
-    MyZWave::MyNode::SetValue(coffeeTable, 0x26, 0, coffeeTableIntensity);
-    MyZWave::MyNode::SetValue(diningTable, 0x26, 0, diningTableIntensity);
-    MyZWave::MyNode::SetValue(kitchen,     0x25, 0, kitchenIntensity);
+    uplight->SetValue(0x26, 0, uplightIntensity);
+    coffeeTable->SetValue(0x26, 0, coffeeTableIntensity);
+    diningTable->SetValue(0x26, 0, diningTableIntensity);
+    kitchen->SetValue(0x25, 0, kitchenIntensity);
   }
 }

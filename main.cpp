@@ -42,10 +42,10 @@ static pthread_mutex_t g_criticalSection;
 static pthread_cond_t  initCond  = PTHREAD_COND_INITIALIZER;
 static pthread_mutex_t initMutex = PTHREAD_MUTEX_INITIALIZER;
 
-MyZWave::TelnetServer telnetServer(2014);
-MyZWave::LightsController lightsController;
-MyZWave::EventProcessor eventProcessor(lightsController);
-MyZWave::CommandParser commandParser(telnetServer, lightsController);
+MyZWave::TelnetServer *telnetServer;
+MyZWave::LightsController *lightsController;
+MyZWave::EventProcessor *eventProcessor;
+MyZWave::CommandParser *commandParser;
 
 uint32 MyZWave::g_homeId;
 //-----------------------------------------------------------------------------
@@ -74,7 +74,7 @@ NodeInfo* GetNodeInfo
 void parseCommand(std::string input) {
   pthread_mutex_lock( &g_criticalSection );
 
-  commandParser.ParseCommand(input);
+  commandParser->ParseCommand(input);
 
   pthread_mutex_unlock( &g_criticalSection );
 }
@@ -178,7 +178,7 @@ void OnNotification
       {
         uint8 event = _notification->GetEvent();
 
-        eventProcessor.ProcessEvent(nodeInfo, event);
+        eventProcessor->ProcessEvent(nodeInfo, event);
       }
       break;
     }
@@ -297,13 +297,18 @@ int main( int argc, char* argv[] )
   // been queried as well.)
   if( !g_initFailed )
   {
+    telnetServer = new MyZWave::TelnetServer(2014);
+    lightsController = new MyZWave::LightsController();
+    eventProcessor = new MyZWave::EventProcessor(*lightsController);
+    commandParser = new MyZWave::CommandParser(*telnetServer, *lightsController);
+
     // If we want to access our NodeInfo list, that has been built from all the
     // notification callbacks we received from the library, we have to do so
     // from inside a Critical Section.  This is because the callbacks occur on other
     // threads, and we cannot risk the list being changed while we are using it.
     // We must hold the critical section for as short a time as possible, to avoid
     // stalling the OpenZWave drivers.
-    telnetServer.listen(&parseCommand);
+    telnetServer->listen(&parseCommand);
 
     // Sleep a bit more to make sure that any messages will be sent
     sleep(1);
@@ -339,7 +344,7 @@ void CreateManager() {
 }
 
 void SignalReceived(int signal) {
-  telnetServer.Stop();
+  telnetServer->Stop();
 }
 
 void CleanUp() {

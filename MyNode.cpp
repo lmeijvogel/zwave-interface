@@ -5,6 +5,10 @@
 using namespace std;
 
 namespace MyZWave {
+  MyNode::MyNode(NodeInfo *nodeInfo) {
+    nodeInfo_ = nodeInfo;
+  }
+
   NodeInfo *MyNode::FindNodeById(uint8 id) {
     for( list<NodeInfo*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
     {
@@ -21,11 +25,17 @@ namespace MyZWave {
   }
 
   bool MyNode::GetValue(NodeInfo *nodeInfo, uint8 classId, uint8 index, uint8 *value) {
-    if (nodeInfo == NULL) {
+    MyNode node(nodeInfo);
+
+    return node.GetValue(classId, index, value);
+  }
+
+  bool MyNode::GetValue(uint8 classId, uint8 index, uint8 *value) {
+    if (nodeInfo_ == NULL) {
       return false;
     }
 
-    for( list<OpenZWave::ValueID>::iterator it2 = nodeInfo->m_values.begin(); it2 != nodeInfo->m_values.end(); ++it2 )
+    for( list<OpenZWave::ValueID>::iterator it2 = nodeInfo_->m_values.begin(); it2 != nodeInfo_->m_values.end(); ++it2 )
     {
       OpenZWave::ValueID v = *it2;
       if (v.GetCommandClassId() == classId && v.GetIndex() == index) {
@@ -38,11 +48,17 @@ namespace MyZWave {
   }
 
   bool MyNode::SetValue(NodeInfo *nodeInfo, uint8 classId, uint8 index, bool value) {
-    if (nodeInfo == NULL) {
+    MyNode node(nodeInfo);
+
+    return node.SetValue(classId, index, value);
+  }
+
+  bool MyNode::SetValue(uint8 classId, uint8 index, bool value) {
+    if (nodeInfo_ == NULL) {
       return false;
     }
 
-    for( list<OpenZWave::ValueID>::iterator it2 = nodeInfo->m_values.begin(); it2 != nodeInfo->m_values.end(); ++it2 )
+    for( list<OpenZWave::ValueID>::iterator it2 = nodeInfo_->m_values.begin(); it2 != nodeInfo_->m_values.end(); ++it2 )
     {
       OpenZWave::ValueID v = *it2;
       if (v.GetCommandClassId() == classId && v.GetIndex() == index) {
@@ -59,11 +75,17 @@ namespace MyZWave {
   }
 
   bool MyNode::SetValue(NodeInfo *nodeInfo, uint8 classId, uint8 index, uint8 value) {
-    if (nodeInfo == NULL) {
+    MyNode node(nodeInfo);
+
+    return node.SetValue(classId, index, value);
+  }
+
+  bool MyNode::SetValue(uint8 classId, uint8 index, uint8 value) {
+    if (nodeInfo_ == NULL) {
       return false;
     }
 
-    for( list<OpenZWave::ValueID>::iterator it2 = nodeInfo->m_values.begin(); it2 != nodeInfo->m_values.end(); ++it2 )
+    for( list<OpenZWave::ValueID>::iterator it2 = nodeInfo_->m_values.begin(); it2 != nodeInfo_->m_values.end(); ++it2 )
     {
       OpenZWave::ValueID v = *it2;
       if (v.GetCommandClassId() == classId && v.GetIndex() == index) {
