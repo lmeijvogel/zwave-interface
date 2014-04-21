@@ -1,6 +1,6 @@
 CC=g++
 CFLAGS=-c -Wall
-EXECUTABLE=main
+EXECUTABLE=zwave-interface
 BOOST_INCLUDES= -I ./boost_1_55_0
 ZWAVE_BASE_DIR=../open-zwave-read-only
 ZWAVE_INCLUDES= -I $(ZWAVE_BASE_DIR)/cpp/src -I $(ZWAVE_BASE_DIR)/cpp/src/command_classes/ -I $(ZWAVE_BASE_DIR)/cpp/src/value_classes/ \
@@ -9,7 +9,7 @@ ZWAVE_INCLUDES= -I $(ZWAVE_BASE_DIR)/cpp/src -I $(ZWAVE_BASE_DIR)/cpp/src/comman
 INCLUDES=$(ZWAVE_INCLUDES) $(BOOST_INCLUDES)
 
 all: main.o Common.o TelnetServer.o CommandParser.o EventProcessor.o LightsController.o MyNode.o
-	$(CC) $? -lopenzwave -l:/usr/local/include/libboost_system.so -o main
+	$(CC) $? -lopenzwave -l:/usr/local/include/libboost_system.so -o $(EXECUTABLE)
 
 main.o: main.cpp
 	$(CC) $(CFLAGS) $< -lopenzwave $(INCLUDES)
@@ -18,4 +18,4 @@ main.o: main.cpp
 	$(CC) $(CFLAGS) $< -lopenzwave $(INCLUDES)
 
 clean:
-	rm -f main *.o *.h.gch
+	rm -f $(EXECUTABLE) *.o *.h.gch
