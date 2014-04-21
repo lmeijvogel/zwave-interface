@@ -34,12 +34,12 @@ namespace MyZWave {
       case Lights_Off:     uplightIntensity     =  0;
                            coffeeTableIntensity =  0;
                            diningTableIntensity =  0;
-                           kitchenIntensity     =  false;
+                           kitchenIntensity     = false;
       break;
       case Lights_Morning: uplightIntensity     =  0;
                            coffeeTableIntensity = 99;
                            diningTableIntensity = 99;
-                           kitchenIntensity     = true ;
+                           kitchenIntensity     = true;
       break;
       case Lights_Regular: uplightIntensity     = 99;
                            coffeeTableIntensity =  0;
@@ -51,10 +51,10 @@ namespace MyZWave {
                            diningTableIntensity = 40;
                            kitchenIntensity     = true;
       break;
-      case Lights_Night:   uplightIntensity     = 20;
+      case Lights_Night:   uplightIntensity     = 25;
                            coffeeTableIntensity =  0;
-                           diningTableIntensity = 20;
-                           kitchenIntensity     = 20;
+                           diningTableIntensity =  0;
+                           kitchenIntensity     = false;
       break;
       default:             uplightIntensity     = 99;
                            coffeeTableIntensity = 99;
