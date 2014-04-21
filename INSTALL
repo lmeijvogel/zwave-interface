@@ -28,3 +28,7 @@ Some steps for installing:
     If you don't name the boost directory 'boost_1_55_0',
     you'll probably have to change the Makefile.
 
+Using the program
+
+Small hint: At least in raspbian, the user running the program
+should be a member of the dialout group
