@@ -337,6 +337,7 @@ void CreateManager() {
   OpenZWave::Options::Get()->AddOptionInt( "PollInterval", 500 );
   OpenZWave::Options::Get()->AddOptionBool( "IntervalBetweenPolls", true );
   OpenZWave::Options::Get()->AddOptionBool("ValidateValueChanges", true);
+  OpenZWave::Options::Get()->AddOptionInt("DriverMaxAttempts", 3);
   OpenZWave::Options::Get()->Lock();
 
   OpenZWave::Manager::Create();
