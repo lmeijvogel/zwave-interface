@@ -20,7 +20,7 @@ namespace MyZWave {
 
   void CommandParser::ParseCommand(std::string input) {
     int nodeId, classId, index, level;
-    char *programme;
+    char *programmeName;
 
     if (sscanf(input.c_str(), "set %i 0x%x %i %i\n", &nodeId, &classId, &index, &level) == 4) {
       NodeInfo *nodeInfo = MyZWave::MyNode::FindNodeById(nodeId);
@@ -82,17 +82,17 @@ namespace MyZWave {
       telnetServer_.WriteLine(message);
 
     }
-    else if (sscanf(input.c_str(), "programme %ms\n", &programme) == 1) {
-      LightsState state;
+    else if (sscanf(input.c_str(), "programme %ms\n", &programmeName) == 1) {
+      Programme programme;
 
-      if (ParseProgramme(programme, &state)) {
-        lightsController_.SetProgramme(state);
+      if (ParseProgramme(programmeName, &programme)) {
+        lightsController_.SetProgramme(programme);
       } else {
         string message = "Unknown programme!\n";
         telnetServer_.WriteLine(message);
       }
 
-      free(programme);
+      free(programmeName);
     }
     else {
       std::string message = "Unknown command!\n";
@@ -106,8 +106,8 @@ namespace MyZWave {
     telnetServer_.WriteLine(message);
   }
 
-  bool CommandParser::ParseProgramme(char *descriptor, LightsState *state) {
-    map<string,LightsState>::iterator it = programmeTranslations_.find(descriptor);
+  bool CommandParser::ParseProgramme(char *descriptor, Programme *state) {
+    map<string,Programme>::iterator it = programmeTranslations_.find(descriptor);
 
     if (it != programmeTranslations_.end()) {
       *state = it->second;

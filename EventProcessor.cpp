@@ -36,7 +36,7 @@ namespace MyZWave {
   }
 
   void EventProcessor::OnPressed() {
-    LightsState newState;
+    Programme newState;
     if (IsNight()) {
       newState = Lights_Night;
     } else if (IsMorning()) {
@@ -72,7 +72,7 @@ namespace MyZWave {
     return timeInfo->tm_hour;
   }
 
-  void EventProcessor::TransitionTo(LightsState newState) {
+  void EventProcessor::TransitionTo(Programme newState) {
     lightsController.SetProgramme(newState);
     currentState = newState;
   }

@@ -1,7 +1,7 @@
-#ifndef LightsState_H_
-#define LightsState_H_
+#ifndef Programme_H_
+#define Programme_H_
 
-enum LightsState
+enum Programme
 {
   Lights_Uninitialized = 0,
   Lights_Off,

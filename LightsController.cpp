@@ -26,11 +26,11 @@ namespace MyZWave {
     delete kitchen;
   }
 
-  void LightsController::SetProgramme( LightsState state ) {
+  void LightsController::SetProgramme( Programme programme ) {
     uint8 uplightIntensity, coffeeTableIntensity, diningTableIntensity;
     bool kitchenIntensity;
 
-    switch (state) {
+    switch (programme) {
       case Lights_Off:     uplightIntensity     =  0;
                            coffeeTableIntensity =  0;
                            diningTableIntensity =  0;

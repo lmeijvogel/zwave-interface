@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include "Common.h"
 #include "LightsController.h"
-#include "LightsState.h"
+#include "Programme.h"
 #include "Node.h"
 
 namespace MyZWave {
@@ -20,10 +20,10 @@ namespace MyZWave {
       bool IsMorning();
 
       int GetHour();
-      void TransitionTo(LightsState newState);
+      void TransitionTo(Programme newState);
 
-      std::map<LightsState,LightsState> masterSwitchOnTransitions;
-      LightsState currentState;
+      std::map<Programme,Programme> masterSwitchOnTransitions;
+      Programme currentState;
 
       LightsController &lightsController;
 

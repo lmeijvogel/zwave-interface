@@ -1,6 +1,6 @@
 #ifndef LightsController_H_
 #define LightsController_H_
-#include "LightsState.h"
+#include "Programme.h"
 #include <stdlib.h>
 #include "Common.h"
 #include "MyNode.h"
@@ -11,7 +11,7 @@ namespace MyZWave {
     LightsController();
     ~LightsController();
 
-    void SetProgramme( LightsState state );
+    void SetProgramme( Programme Programme );
 
     private:
     MyZWave::MyNode *uplight;

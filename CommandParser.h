@@ -3,7 +3,7 @@
 
 #include "TelnetServer.h"
 #include "LightsController.h"
-#include "LightsState.h"
+#include "Programme.h"
 
 namespace MyZWave {
   class CommandParser {
@@ -15,10 +15,10 @@ namespace MyZWave {
       TelnetServer &telnetServer_;
       LightsController &lightsController_;
 
-      std::map<string,LightsState> programmeTranslations_;
+      std::map<string,Programme> programmeTranslations_;
 
       void NodeUnknownMessage(int nodeId);
-      bool ParseProgramme(char *descriptor, LightsState *state);
+      bool ParseProgramme(char *descriptor, Programme *programme);
   };
 }
 #endif
