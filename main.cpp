@@ -268,22 +268,8 @@ int main( int argc, char* argv[] )
 
   // Add a Z-Wave Driver
   // Modify this line to set the correct serial port for your PC interface.
-
-#ifdef DARWIN
-  string port = "/dev/cu.usbserial";
-#elif WIN32
-        string port = "\\\\.\\COM6";
-#else
   string port = "/dev/ttyUSB0";
-#endif
-  if( strcasecmp( port.c_str(), "usb" ) == 0 )
-  {
-    OpenZWave::Manager::Get()->AddDriver( "HID Controller", OpenZWave::Driver::ControllerInterface_Hid );
-  }
-  else
-  {
-    OpenZWave::Manager::Get()->AddDriver( port );
-  }
+  OpenZWave::Manager::Get()->AddDriver( port );
 
   // Now we just wait for either the AwakeNodesQueried or AllNodesQueried notification,
   // then write out the config file.
