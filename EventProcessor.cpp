@@ -7,8 +7,9 @@
  * Don't do this via telnet, it will probably feel slower.
  */
 namespace MyZWave {
-  EventProcessor::EventProcessor(LightsController &lightsController) :
-    lightsController(lightsController)
+  EventProcessor::EventProcessor(LightsController &lightsController, TimeService &timeService) :
+    lightsController(lightsController),
+    timeService(timeService)
   {
     masterSwitchId = 3;
 
@@ -37,9 +38,9 @@ namespace MyZWave {
 
   void EventProcessor::OnPressed() {
     Programme newState;
-    if (IsNight()) {
+    if (timeService.IsNight()) {
       newState = Lights_Night;
-    } else if (IsMorning()) {
+    } else if (timeService.IsMorning()) {
       newState = Lights_Morning;
     } else {
       newState = masterSwitchOnTransitions[currentState];
@@ -50,26 +51,6 @@ namespace MyZWave {
 
   void EventProcessor::OffPressed() {
     TransitionTo(Lights_Off);
-  }
-
-  bool EventProcessor::IsNight() {
-    int hour = GetHour();
-    return (0 < hour && hour < 6);
-  }
-
-  bool EventProcessor::IsMorning() {
-    int hour = GetHour();
-    return (6 < hour && hour < 12);
-  }
-
-  int EventProcessor::GetHour() {
-    struct tm * timeInfo;
-
-    time_t currentTime = time(NULL);
-
-    timeInfo = localtime(&currentTime);
-
-    return timeInfo->tm_hour;
   }
 
   void EventProcessor::TransitionTo(Programme newState) {

@@ -25,6 +25,7 @@
 #include "TelnetServer.h"
 #include "CommandParser.h"
 #include "MyNode.h"
+#include "TimeService.h"
 #include "EventProcessor.h"
 #include "LightsController.h"
 
@@ -44,6 +45,7 @@ static pthread_mutex_t initMutex = PTHREAD_MUTEX_INITIALIZER;
 
 MyZWave::TelnetServer *telnetServer;
 MyZWave::LightsController *lightsController;
+MyZWave::TimeService *timeService;
 MyZWave::EventProcessor *eventProcessor;
 MyZWave::CommandParser *commandParser;
 
@@ -285,7 +287,8 @@ int main( int argc, char* argv[] )
   {
     telnetServer = new MyZWave::TelnetServer(2014);
     lightsController = new MyZWave::LightsController();
-    eventProcessor = new MyZWave::EventProcessor(*lightsController);
+    timeService = new MyZWave::TimeService();
+    eventProcessor = new MyZWave::EventProcessor(*lightsController, *timeService);
     commandParser = new MyZWave::CommandParser(*telnetServer, *lightsController);
 
     // If we want to access our NodeInfo list, that has been built from all the
