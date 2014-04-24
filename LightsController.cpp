@@ -4,9 +4,9 @@
 namespace MyZWave {
   LightsController::LightsController() {
     uint8 uplightId     = 2;
-    uint8 coffeeTableId = 4;
+    uint8 coffeeTableId = 7;
     uint8 diningTableId = 5;
-    uint8 kitchenId     = 7;
+    uint8 kitchenId     = 8;
 
     NodeInfo *uplightNi     = MyZWave::MyNode::FindNodeById(uplightId);
     NodeInfo *coffeeTableNi = MyZWave::MyNode::FindNodeById(coffeeTableId);
@@ -27,45 +27,45 @@ namespace MyZWave {
   }
 
   void LightsController::SetProgramme( Programme programme ) {
-    uint8 uplightIntensity, coffeeTableIntensity, diningTableIntensity;
-    bool kitchenIntensity;
+    uint8 uplightIntensity, diningTableIntensity, kitchenIntensity;
+    bool coffeeTableOn;
 
     switch (programme) {
       case Lights_Off:     uplightIntensity     =  0;
-                           coffeeTableIntensity =  0;
+                           coffeeTableOn        = false;
                            diningTableIntensity =  0;
-                           kitchenIntensity     = false;
+                           kitchenIntensity     =  0;
       break;
       case Lights_Morning: uplightIntensity     =  0;
-                           coffeeTableIntensity = 99;
+                           coffeeTableOn        = true;
                            diningTableIntensity = 99;
-                           kitchenIntensity     = true;
+                           kitchenIntensity     = 99;
       break;
       case Lights_Regular: uplightIntensity     = 99;
-                           coffeeTableIntensity =  0;
+                           coffeeTableOn        = false;
                            diningTableIntensity = 99;
-                           kitchenIntensity     = true;
+                           kitchenIntensity     = 99;
       break;
       case Lights_Dimmed:  uplightIntensity     = 40;
-                           coffeeTableIntensity =  0;
-                           diningTableIntensity = 40;
-                           kitchenIntensity     = true;
+                           coffeeTableOn        = false;
+                           diningTableIntensity = 99;
+                           kitchenIntensity     = 40;
       break;
       case Lights_Night:   uplightIntensity     = 25;
-                           coffeeTableIntensity =  0;
+                           coffeeTableOn        = false;
                            diningTableIntensity =  0;
-                           kitchenIntensity     = false;
+                           kitchenIntensity     = 25;
       break;
       default:             uplightIntensity     = 99;
-                           coffeeTableIntensity = 99;
+                           coffeeTableOn        = true;
                            diningTableIntensity = 99;
-                           kitchenIntensity     = true;
+                           kitchenIntensity     = 99;
       break;
     }
 
     uplight->SetValue(0x26, 0, uplightIntensity);
-    coffeeTable->SetValue(0x26, 0, coffeeTableIntensity);
+    coffeeTable->SetValue(0x25, 0, coffeeTableOn       );
     diningTable->SetValue(0x26, 0, diningTableIntensity);
-    kitchen->SetValue(0x25, 0, kitchenIntensity);
+    kitchen->SetValue(0x26, 0, kitchenIntensity);
   }
 }
