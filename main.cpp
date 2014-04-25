@@ -22,6 +22,7 @@
 #include "ValueBool.h"
 #include "Log.h"
 #include "Common.h"
+#include "PidfileService.h"
 #include "TelnetServer.h"
 #include "CommandParser.h"
 #include "MyNode.h"
@@ -42,6 +43,8 @@ list<NodeInfo*> MyZWave::MyNode::nodes;
 static pthread_mutex_t g_criticalSection;
 static pthread_cond_t  initCond  = PTHREAD_COND_INITIALIZER;
 static pthread_mutex_t initMutex = PTHREAD_MUTEX_INITIALIZER;
+
+MyZWave::PidfileService *pidfileService;
 
 MyZWave::TelnetServer *telnetServer;
 MyZWave::LightsController *lightsController;
@@ -245,6 +248,18 @@ bool g_cleaningUp = false;
 //-----------------------------------------------------------------------------
 int main( int argc, char* argv[] )
 {
+  string pidfileName;
+
+  string argName = "--pidfile";
+  if (argc == 3 && strcmp(argv[1], argName.c_str()) == 0) {
+    pidfileName = argv[2];
+  } else {
+    pidfileName = "./pid";
+  }
+
+  pidfileService = new MyZWave::PidfileService(pidfileName);
+  pidfileService->CreatePidfile();
+
   pthread_mutexattr_t mutexattr;
 
   pthread_mutexattr_init ( &mutexattr );
@@ -350,5 +365,7 @@ void CleanUp() {
   OpenZWave::Options::Destroy();
   pthread_mutex_destroy( &g_criticalSection );
 
+  pidfileService->DeletePidfile();
+  delete pidfileService;
   exit(0);
 }
