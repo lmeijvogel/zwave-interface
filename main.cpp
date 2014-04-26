@@ -11,17 +11,14 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <signal.h>
-#include "Options.h"
 #include "Manager.h"
-#include "Driver.h"
 #include "Node.h"
 #include "Group.h"
-#include "Notification.h"
 #include "ValueStore.h"
 #include "Value.h"
 #include "ValueBool.h"
-#include "Log.h"
 #include "Common.h"
+#include "ManagerFactory.h"
 #include "PidfileService.h"
 #include "TelnetServer.h"
 #include "CommandParser.h"
@@ -34,7 +31,6 @@ using namespace std;
 
 static bool g_initFailed = false;
 
-void CreateManager();
 void CleanUp();
 void SignalReceived(int signal);
 
@@ -45,6 +41,8 @@ static pthread_cond_t  initCond  = PTHREAD_COND_INITIALIZER;
 static pthread_mutex_t initMutex = PTHREAD_MUTEX_INITIALIZER;
 
 MyZWave::PidfileService *pidfileService;
+
+MyZWave::ManagerFactory *managerFactory;
 
 MyZWave::TelnetServer *telnetServer;
 MyZWave::LightsController *lightsController;
@@ -275,18 +273,8 @@ int main( int argc, char* argv[] )
 
   printf("Starting MinOZW with OpenZWave Version %s\n", OpenZWave::Manager::getVersionAsString().c_str());
 
-  CreateManager();
-
-  // Add a callback handler to the manager.  The second argument is a context that
-  // is passed to the OnNotification method.  If the OnNotification is a method of
-  // a class, the context would usually be a pointer to that class object, to
-  // avoid the need for the notification handler to be a static.
-  OpenZWave::Manager::Get()->AddWatcher( OnNotification, NULL );
-
-  // Add a Z-Wave Driver
-  // Modify this line to set the correct serial port for your PC interface.
-  string port = "/dev/ttyUSB0";
-  OpenZWave::Manager::Get()->AddDriver( port );
+  managerFactory = new MyZWave::ManagerFactory( "/dev/ttyUSB0", OnNotification );
+  managerFactory->Create();
 
   // Now we just wait for either the AwakeNodesQueried or AllNodesQueried notification,
   // then write out the config file.
@@ -329,25 +317,6 @@ int main( int argc, char* argv[] )
   return 0;
 }
 
-void CreateManager() {
-  // Create the OpenZWave Manager.
-  // The first argument is the path to the config files (where the manufacturer_specific.xml file is located
-  // The second argument is the path for saved Z-Wave network state and the log file.  If you leave it NULL
-  // the log file will appear in the program's working directory.
-  OpenZWave::Options::Create( "../../../config/", "", "" );
-  OpenZWave::Options::Get()->AddOptionInt( "SaveLogLevel", OpenZWave::LogLevel_Error );
-  OpenZWave::Options::Get()->AddOptionInt( "QueueLogLevel", OpenZWave::LogLevel_Error );
-  OpenZWave::Options::Get()->AddOptionInt( "DumpTrigger", OpenZWave::LogLevel_Error );
-  OpenZWave::Options::Get()->AddOptionInt( "PollInterval", 500 );
-  OpenZWave::Options::Get()->AddOptionBool( "IntervalBetweenPolls", true );
-  OpenZWave::Options::Get()->AddOptionBool("ValidateValueChanges", true);
-  OpenZWave::Options::Get()->AddOptionInt("DriverMaxAttempts", 3);
-  OpenZWave::Options::Get()->Lock();
-
-  OpenZWave::Manager::Create();
-
-}
-
 void SignalReceived(int signal) {
   telnetServer->Stop();
 }
@@ -359,10 +328,9 @@ void CleanUp() {
 
   g_cleaningUp = true;
 
-  OpenZWave::Manager::Get()->RemoveDriver( "/dev/ttyUSB0" );
-  OpenZWave::Manager::Get()->RemoveWatcher( OnNotification, NULL );
-  OpenZWave::Manager::Destroy();
-  OpenZWave::Options::Destroy();
+  managerFactory->Destroy();
+  delete managerFactory;
+
   pthread_mutex_destroy( &g_criticalSection );
 
   pidfileService->DeletePidfile();
