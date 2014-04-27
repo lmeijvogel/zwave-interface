@@ -314,6 +314,10 @@ int main( int argc, char* argv[] )
 
   CleanUp();
 
+  if (g_initFailed) {
+    return 1;
+  }
+
   return 0;
 }
 
@@ -335,5 +339,4 @@ void CleanUp() {
 
   pidfileService->DeletePidfile();
   delete pidfileService;
-  exit(0);
 }
