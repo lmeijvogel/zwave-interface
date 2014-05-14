@@ -48,7 +48,7 @@ namespace MyZWave {
       break;
       case Lights_Dimmed:  uplightIntensity     = 40;
                            coffeeTableOn        = false;
-                           diningTableIntensity = 99;
+                           diningTableIntensity = 50;
                            kitchenIntensity     = 40;
       break;
       case Lights_Night:   uplightIntensity     = 25;
