@@ -7,8 +7,7 @@
 #include "boost/format.hpp"
 
 namespace MyZWave {
-  CommandParser::CommandParser(TelnetServer &telnetServer, LightsController &lightsController) :
-    telnetServer_(telnetServer),
+  CommandParser::CommandParser(LightsController &lightsController) :
     lightsController_(lightsController)
   {
     programmeTranslations_["off"] = Lights_Off;
@@ -50,7 +49,7 @@ namespace MyZWave {
         result = (boost::format("ERROR: %i 0x%x %i %i\n") % (int)nodeId % (int)classId % (int)index % (int)level).str();
       }
 
-      telnetServer_.WriteLine(result);
+      std::cout << (result);
 
     }
     else if (sscanf(input.c_str(), "get %i 0x%x %i\n", &nodeId, &classId, &index) == 3) {
@@ -65,7 +64,7 @@ namespace MyZWave {
       if (MyZWave::MyNode::GetValue(nodeInfo, classId, index, &value)) {
         std::string result = (boost::format("%i 0x%x %i: %i\n") % (int)nodeId % (int)classId % (int)index % (int)value).str();
 
-        telnetServer_.WriteLine(result);
+        std::cout << (result);
       }
     }
     else if (sscanf(input.c_str(), "refresh %i\n", &nodeId) == 1) {
@@ -79,7 +78,8 @@ namespace MyZWave {
       OpenZWave::Manager::Get()->TestNetworkNode(MyZWave::g_homeId, nodeId, 5);
       OpenZWave::Manager::Get()->RefreshNodeInfo(MyZWave::g_homeId, nodeId);
       string message = (boost::format("OK: Refreshing node %i\n") % (int)nodeId).str();
-      telnetServer_.WriteLine(message);
+      //telnetServer_.WriteLine(message);
+      std::cout << message << std::endl;
 
     }
     else if (sscanf(input.c_str(), "programme %ms\n", &programmeName) == 1) {
@@ -89,7 +89,8 @@ namespace MyZWave {
         lightsController_.SetProgramme(programme);
       } else {
         string message = "Unknown programme!\n";
-        telnetServer_.WriteLine(message);
+        //telnetServer_.WriteLine(message);
+        std::cout << message << std::endl;
       }
 
       free(programmeName);
@@ -97,13 +98,15 @@ namespace MyZWave {
     else {
       std::string message = "Unknown command!\n";
 
-      telnetServer_.WriteLine(message);
+      //telnetServer_.WriteLine(message);
+      std::cout << message << std::endl;
     }
   }
 
   void CommandParser::NodeUnknownMessage(int nodeId) {
     string message = (boost::format("ERROR: Node %i unknown\n") % (int)nodeId).str();
-    telnetServer_.WriteLine(message);
+    //telnetServer_.WriteLine(message);
+      std::cout << message << std::endl;
   }
 
   bool CommandParser::ParseProgramme(char *descriptor, Programme *state) {

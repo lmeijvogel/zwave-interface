@@ -8,11 +8,11 @@
 namespace MyZWave {
   class CommandParser {
     public:
-      CommandParser(TelnetServer &telnetServer, LightsController &lightsController);
+      CommandParser(LightsController &lightsController);
 
       void ParseCommand(std::string input);
     private:
-      TelnetServer &telnetServer_;
+      //TelnetServer &telnetServer_;
       LightsController &lightsController_;
 
       std::map<string,Programme> programmeTranslations_;

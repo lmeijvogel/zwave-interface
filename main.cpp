@@ -20,7 +20,7 @@
 #include "Common.h"
 #include "ManagerFactory.h"
 #include "PidfileService.h"
-#include "TelnetServer.h"
+#include "RedisListener.h"
 #include "CommandParser.h"
 #include "MyNode.h"
 #include "TimeService.h"
@@ -32,6 +32,7 @@ using namespace std;
 static bool g_initFailed = false;
 
 void CleanUp();
+void InitSucceeded();
 void SignalReceived(int signal);
 
 list<NodeInfo*> MyZWave::MyNode::nodes;
@@ -44,7 +45,7 @@ MyZWave::PidfileService *pidfileService;
 
 MyZWave::ManagerFactory *managerFactory;
 
-MyZWave::TelnetServer *telnetServer;
+MyZWave::RedisListener *redisListener;
 MyZWave::LightsController *lightsController;
 MyZWave::TimeService *timeService;
 MyZWave::EventProcessor *eventProcessor;
@@ -221,7 +222,7 @@ void OnNotification
     case OpenZWave::Notification::Type_AllNodesQueried:
     case OpenZWave::Notification::Type_AllNodesQueriedSomeDead:
     {
-      pthread_cond_broadcast(&initCond);
+      InitSucceeded();
       break;
     }
 
@@ -288,11 +289,11 @@ int main( int argc, char* argv[] )
   // been queried as well.)
   if( !g_initFailed )
   {
-    telnetServer = new MyZWave::TelnetServer(2014);
+    redisListener = new MyZWave::RedisListener("MyZWave", &parseCommand);
     lightsController = new MyZWave::LightsController();
     timeService = new MyZWave::TimeService();
     eventProcessor = new MyZWave::EventProcessor(*lightsController, *timeService);
-    commandParser = new MyZWave::CommandParser(*telnetServer, *lightsController);
+    commandParser = new MyZWave::CommandParser(*lightsController);
 
     // If we want to access our NodeInfo list, that has been built from all the
     // notification callbacks we received from the library, we have to do so
@@ -300,7 +301,7 @@ int main( int argc, char* argv[] )
     // threads, and we cannot risk the list being changed while we are using it.
     // We must hold the critical section for as short a time as possible, to avoid
     // stalling the OpenZWave drivers.
-    telnetServer->listen(&parseCommand);
+    redisListener->Start();
 
     // Sleep a bit more to make sure that any messages will be sent
     sleep(1);
@@ -321,8 +322,15 @@ int main( int argc, char* argv[] )
   return 0;
 }
 
+void InitSucceeded() {
+  pthread_mutex_lock( &g_criticalSection );
+  printf("Init Succeeded\n");
+  pthread_cond_broadcast(&initCond);
+  pthread_mutex_unlock( &g_criticalSection );
+}
+
 void SignalReceived(int signal) {
-  telnetServer->Stop();
+  redisListener->Stop();
 }
 
 void CleanUp() {
