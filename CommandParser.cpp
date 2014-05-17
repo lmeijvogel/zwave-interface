@@ -27,6 +27,7 @@ namespace MyZWave {
     int nodeId, classId, index, level;
     char *lightName;
     char *programmeName;
+    char *onOff;
 
     if (sscanf(input.c_str(), "dim %ms %i\n", &lightName, &level) == 2) {
       NodeInfo *nodeInfo = MyZWave::MyNode::FindNodeById((uint8)lightTranslations_[lightName]);
@@ -43,6 +44,24 @@ namespace MyZWave {
 
       cout << result;
       free(lightName);
+    }
+    else if (sscanf(input.c_str(), "switch %ms %ms\n", &lightName, &onOff)) {
+      NodeInfo *nodeInfo = MyZWave::MyNode::FindNodeById((uint8)lightTranslations_[lightName]);
+
+      bool success = MyZWave::MyNode::SetValue(nodeInfo, 0x25, 0, strcmp(onOff, "on") == 0);
+
+      string result;
+
+      if (success) {
+        result = "OK\n";
+      }
+      else {
+        result = "Could not set value!\n";
+      }
+
+      cout << result;
+      free(lightName);
+      free(onOff);
     }
     else if (sscanf(input.c_str(), "set %i 1x%x %i %i\n", &nodeId, &classId, &index, &level) == 4) {
       NodeInfo *nodeInfo = MyZWave::MyNode::FindNodeById(nodeId);
