@@ -10,11 +10,11 @@ namespace MyZWave {
   CommandParser::CommandParser(LightsController &lightsController) :
     lightsController_(lightsController)
   {
-    programmeTranslations_["off"] = Lights_Off;
-    programmeTranslations_["morning"] = Lights_Morning;
-    programmeTranslations_["regular"] = Lights_Regular;
-    programmeTranslations_["dimmed"] = Lights_Dimmed;
-    programmeTranslations_["night"] = Lights_Night;
+    programmeTranslations_["off"] = Programme_Off;
+    programmeTranslations_["morning"] = Programme_Morning;
+    programmeTranslations_["regular"] = Programme_Regular;
+    programmeTranslations_["dimmed"] = Programme_Dimmed;
+    programmeTranslations_["night"] = Programme_Night;
 
     lightTranslations_["kitchen"] = Light_Kitchen;
     lightTranslations_["uplight"] = Light_Uplight;

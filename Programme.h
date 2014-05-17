@@ -3,12 +3,12 @@
 
 enum Programme
 {
-  Lights_Uninitialized = 0,
-  Lights_Off,
-  Lights_Morning,
-  Lights_Regular,
-  Lights_Dimmed,
-  Lights_Night,
-  Lights_Custom
+  Programme_Uninitialized = 0,
+  Programme_Off,
+  Programme_Morning,
+  Programme_Regular,
+  Programme_Dimmed,
+  Programme_Night,
+  Programme_Custom
 };
 #endif

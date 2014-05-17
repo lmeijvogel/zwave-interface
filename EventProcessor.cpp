@@ -13,17 +13,17 @@ namespace MyZWave {
   {
     masterSwitchId = 3;
 
-    masterSwitchOnTransitions[ Lights_Off           ] = Lights_Regular;
+    masterSwitchOnTransitions[ Programme_Off           ] = Programme_Regular;
 
-    masterSwitchOnTransitions[ Lights_Morning       ] = Lights_Morning;
+    masterSwitchOnTransitions[ Programme_Morning       ] = Programme_Morning;
 
-    masterSwitchOnTransitions[ Lights_Dimmed        ] = Lights_Regular;
-    masterSwitchOnTransitions[ Lights_Regular       ] = Lights_Dimmed;
+    masterSwitchOnTransitions[ Programme_Dimmed        ] = Programme_Regular;
+    masterSwitchOnTransitions[ Programme_Regular       ] = Programme_Dimmed;
 
-    masterSwitchOnTransitions[ Lights_Night         ] = Lights_Night;
+    masterSwitchOnTransitions[ Programme_Night         ] = Programme_Night;
 
-    masterSwitchOnTransitions[ Lights_Uninitialized ] = Lights_Regular;
-    masterSwitchOnTransitions[ Lights_Custom        ] = Lights_Regular;
+    masterSwitchOnTransitions[ Programme_Uninitialized ] = Programme_Regular;
+    masterSwitchOnTransitions[ Programme_Custom        ] = Programme_Regular;
   }
 
   void EventProcessor::ProcessEvent(NodeInfo *nodeInfo, uint8 event) {
@@ -39,9 +39,9 @@ namespace MyZWave {
   void EventProcessor::OnPressed() {
     Programme newState;
     if (timeService.IsNight()) {
-      newState = Lights_Night;
+      newState = Programme_Night;
     } else if (timeService.IsMorning()) {
-      newState = Lights_Morning;
+      newState = Programme_Morning;
     } else {
       newState = masterSwitchOnTransitions[currentState];
     }
@@ -50,7 +50,7 @@ namespace MyZWave {
   }
 
   void EventProcessor::OffPressed() {
-    TransitionTo(Lights_Off);
+    TransitionTo(Programme_Off);
   }
 
   void EventProcessor::TransitionTo(Programme newState) {
