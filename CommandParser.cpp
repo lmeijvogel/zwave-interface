@@ -18,7 +18,7 @@ namespace MyZWave {
 
     lightTranslations_["kitchen"] = Light_Kitchen;
     lightTranslations_["uplight"] = Light_Uplight;
-    lightTranslations_["coffeetable"] = Light_CoffeeTable;
+    lightTranslations_["coffeeTable"] = Light_CoffeeTable;
     lightTranslations_["diningTable"] = Light_DiningTable;
 
   }
