@@ -101,7 +101,6 @@ namespace MyZWave {
       OpenZWave::Manager::Get()->TestNetworkNode(MyZWave::g_homeId, nodeId, 5);
       OpenZWave::Manager::Get()->RefreshNodeInfo(MyZWave::g_homeId, nodeId);
       string message = (boost::format("OK: Refreshing node %i\n") % (int)nodeId).str();
-      //telnetServer_.WriteLine(message);
       std::cout << message << std::endl;
 
     }
@@ -112,7 +111,6 @@ namespace MyZWave {
         lightsController_.SetProgramme(programme);
       } else {
         string message = "Unknown programme!\n";
-        //telnetServer_.WriteLine(message);
         std::cout << message << std::endl;
       }
 
@@ -121,15 +119,13 @@ namespace MyZWave {
     else {
       std::string message = "Unknown command!\n";
 
-      //telnetServer_.WriteLine(message);
       std::cout << message << std::endl;
     }
   }
 
   void CommandParser::NodeUnknownMessage(int nodeId) {
     string message = (boost::format("ERROR: Node %i unknown\n") % (int)nodeId).str();
-    //telnetServer_.WriteLine(message);
-      std::cout << message << std::endl;
+    std::cout << message << std::endl;
   }
 
   bool CommandParser::ParseProgramme(char *descriptor, Programme *state) {
