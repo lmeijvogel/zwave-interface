@@ -1,17 +1,14 @@
 #include "LightsController.h"
+#include "Light.h"
+
 #include <stdlib.h>
 
 namespace MyZWave {
   LightsController::LightsController() {
-    uint8 uplightId     = 2;
-    uint8 coffeeTableId = 7;
-    uint8 diningTableId = 5;
-    uint8 kitchenId     = 8;
-
-    NodeInfo *uplightNi     = MyZWave::MyNode::FindNodeById(uplightId);
-    NodeInfo *coffeeTableNi = MyZWave::MyNode::FindNodeById(coffeeTableId);
-    NodeInfo *diningTableNi = MyZWave::MyNode::FindNodeById(diningTableId);
-    NodeInfo *kitchenNi     = MyZWave::MyNode::FindNodeById(kitchenId);
+    NodeInfo *uplightNi     = MyZWave::MyNode::FindNodeById(Light_Uplight);
+    NodeInfo *coffeeTableNi = MyZWave::MyNode::FindNodeById(Light_CoffeeTable);
+    NodeInfo *diningTableNi = MyZWave::MyNode::FindNodeById(Light_DiningTable);
+    NodeInfo *kitchenNi     = MyZWave::MyNode::FindNodeById(Light_Kitchen);
 
     uplight     = new MyZWave::MyNode(uplightNi);
     coffeeTable = new MyZWave::MyNode(coffeeTableNi);

@@ -15,13 +15,36 @@ namespace MyZWave {
     programmeTranslations_["regular"] = Lights_Regular;
     programmeTranslations_["dimmed"] = Lights_Dimmed;
     programmeTranslations_["night"] = Lights_Night;
+
+    lightTranslations_["kitchen"] = Light_Kitchen;
+    lightTranslations_["uplight"] = Light_Uplight;
+    lightTranslations_["coffeetable"] = Light_CoffeeTable;
+    lightTranslations_["diningTable"] = Light_DiningTable;
+
   }
 
   void CommandParser::ParseCommand(std::string input) {
     int nodeId, classId, index, level;
+    char *lightName;
     char *programmeName;
 
-    if (sscanf(input.c_str(), "set %i 0x%x %i %i\n", &nodeId, &classId, &index, &level) == 4) {
+    if (sscanf(input.c_str(), "dim %ms %i\n", &lightName, &level) == 2) {
+      NodeInfo *nodeInfo = MyZWave::MyNode::FindNodeById((uint8)lightTranslations_[lightName]);
+
+      bool  success = MyZWave::MyNode::SetValue(nodeInfo, 0x26, 0, level);
+      string result;
+
+      if (success) {
+        result = (boost::format("OK: %i 0x%x %i %i\n") % (int)nodeId % (int)classId % (int)index % (int)level).str();
+      }
+      else {
+        result = "Could not set value!\n";
+      }
+
+      cout << result;
+      free(lightName);
+    }
+    else if (sscanf(input.c_str(), "set %i 1x%x %i %i\n", &nodeId, &classId, &index, &level) == 4) {
       NodeInfo *nodeInfo = MyZWave::MyNode::FindNodeById(nodeId);
 
       if (!nodeInfo || !nodeInfo->m_nodeId) {
