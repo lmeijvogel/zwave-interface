@@ -35,7 +35,7 @@ namespace MyZWave {
       string result;
 
       if (success) {
-        result = (boost::format("OK: %i 0x%x %i %i\n") % (int)nodeId % (int)classId % (int)index % (int)level).str();
+        result = "OK\n";
       }
       else {
         result = "Could not set value!\n";
@@ -58,12 +58,12 @@ namespace MyZWave {
       if (classId == 0x25) { // switch, so boolean
         success = MyZWave::MyNode::SetValue(nodeInfo, classId, index, (level != 0));
         if (success) {
-          result = (boost::format("OK: %i 0x%x %i %i\n") % (int)nodeId % (int)classId % (int)index % (int)level).str();
+          result = "OK\n";
         }
       } else {
         success = MyZWave::MyNode::SetValue(nodeInfo, classId, index, level);
         if (success) {
-          result = (boost::format("OK: %i 0x%x %i %i\n") % (int)nodeId % (int)classId % (int)index % (int)level).str();
+          result = "OK\n";
         }
       }
 
