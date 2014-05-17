@@ -303,8 +303,10 @@ int main( int argc, char* argv[] )
     // stalling the OpenZWave drivers.
     redisListener->Start();
 
-    // Sleep a bit more to make sure that any messages will be sent
-    sleep(1);
+    while (true) {
+      // Sleep a bit more to make sure that any messages will be sent
+      sleep(1);
+    }
 
     OpenZWave::Driver::DriverData data;
     OpenZWave::Manager::Get()->GetDriverStatistics( MyZWave::g_homeId, &data );

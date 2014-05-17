@@ -2,6 +2,7 @@
 #define RedisListener_H_
 
 #include <string>
+#include <boost/thread.hpp>
 
 namespace MyZWave {
   class RedisListener {
@@ -15,6 +16,10 @@ namespace MyZWave {
       void (*resultHandler_)(std::string input);
 
       bool stopping_;
+
+      boost::thread thread_;
+
+      void ListeningThread();
   };
 }
 #endif
