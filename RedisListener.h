@@ -15,8 +15,6 @@ namespace MyZWave {
       std::string channel_;
       void (*resultHandler_)(std::string input);
 
-      bool stopping_;
-
       boost::thread thread_;
 
       void ListeningThread();

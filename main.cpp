@@ -52,6 +52,9 @@ MyZWave::EventProcessor *eventProcessor;
 MyZWave::CommandParser *commandParser;
 
 uint32 MyZWave::g_homeId;
+
+bool stopping;
+
 //-----------------------------------------------------------------------------
 // <GetNodeInfo>
 // Return the NodeInfo object associated with this notification
@@ -303,7 +306,8 @@ int main( int argc, char* argv[] )
     // stalling the OpenZWave drivers.
     redisListener->Start();
 
-    while (true) {
+    stopping = false;
+    while (!stopping) {
       // Sleep a bit more to make sure that any messages will be sent
       sleep(1);
     }
@@ -326,13 +330,13 @@ int main( int argc, char* argv[] )
 
 void InitSucceeded() {
   pthread_mutex_lock( &g_criticalSection );
-  printf("Init Succeeded\n");
   pthread_cond_broadcast(&initCond);
   pthread_mutex_unlock( &g_criticalSection );
 }
 
 void SignalReceived(int signal) {
   redisListener->Stop();
+  stopping = true;
 }
 
 void CleanUp() {

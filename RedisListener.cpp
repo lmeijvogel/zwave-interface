@@ -11,16 +11,14 @@ namespace MyZWave {
 
   void RedisListener::Start()
   {
-    std::cout << "Creating thread" << std::endl;
     thread_ = boost::thread(&RedisListener::ListeningThread, this);
-    std::cout << "... created" << std::endl;
   }
 
   void RedisListener::ListeningThread()
   {
+    redisContext *redis;
     try {
-      std::cout << "Thread started!" << std::endl;
-      redisContext *redis = redisConnect("127.0.0.1", 6379);
+      redis = redisConnect("127.0.0.1", 6379);
 
       if (redis->err) {
         std::cout << "Error: " << redis->errstr << std::endl;
@@ -30,27 +28,36 @@ namespace MyZWave {
 
       reply_alloc = (void *)redisCommand(redis, ("subscribe "+channel_).c_str() );
 
-      std::cout << "after reply_alloc\n";
-      //stopping_ = false;
+      struct timeval tv = { 1, 1000 };
 
-      while (redisGetReply(redis, &reply_alloc) == REDIS_OK) {
-        std::cout << "inside while\n";
-        redisReply *reply = (redisReply *)reply_alloc;
+      for (int count = 0 ; ; count++) {
+        redisSetTimeout(redis, tv);
 
-        std::string message = reply->element[2]->str;
-        resultHandler_(message);
+        if (redisGetReply(redis, &reply_alloc) == REDIS_OK) {
+          redisReply *reply = (redisReply *)reply_alloc;
+
+          std::string message = reply->element[2]->str;
+          resultHandler_(message);
+          freeReplyObject(reply_alloc);
+        }
+
+        // If the error state is not cleared, subsequent redisGetReply
+        // calls will fail
+        redis->err = 0;
+
+        // Allow interrupting the thread here.
+        boost::this_thread::interruption_point();
       }
     }
     catch(boost::thread_interrupted&)
     {
-      std::cout << "Thread stopped" <<std::endl;
+      redisFree(redis);
       return;
     }
   }
 
   void RedisListener::Stop()
   {
-    std::cout << "Stopping!" << std::endl;
     thread_.interrupt();
     thread_.join();
   }
