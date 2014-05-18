@@ -63,7 +63,7 @@ namespace MyZWave {
       free(lightName);
       free(onOff);
     }
-    else if (sscanf(input.c_str(), "set %i 1x%x %i %i\n", &nodeId, &classId, &index, &level) == 4) {
+    else if (sscanf(input.c_str(), "set %i 0x%x %i %i\n", &nodeId, &classId, &index, &level) == 4) {
       NodeInfo *nodeInfo = MyZWave::MyNode::FindNodeById(nodeId);
 
       if (!nodeInfo || !nodeInfo->m_nodeId) {
