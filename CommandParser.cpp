@@ -7,8 +7,8 @@
 #include "boost/format.hpp"
 
 namespace MyZWave {
-  CommandParser::CommandParser(LightsController &lightsController) :
-    lightsController_(lightsController)
+  CommandParser::CommandParser(EventProcessor  &eventProcessor) :
+    eventProcessor_(eventProcessor)
   {
     programmeTranslations_["off"] = Programme_Off;
     programmeTranslations_["morning"] = Programme_Morning;
@@ -127,7 +127,7 @@ namespace MyZWave {
       Programme programme;
 
       if (ParseProgramme(programmeName, &programme)) {
-        lightsController_.SetProgramme(programme);
+        eventProcessor_.DirectTransition(programme);
       } else {
         string message = "Unknown programme!\n";
         std::cout << message << std::endl;

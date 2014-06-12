@@ -296,7 +296,7 @@ int main( int argc, char* argv[] )
     lightsController = new MyZWave::LightsController();
     timeService = new MyZWave::TimeService();
     eventProcessor = new MyZWave::EventProcessor(*lightsController, *timeService);
-    commandParser = new MyZWave::CommandParser(*lightsController);
+    commandParser = new MyZWave::CommandParser(*eventProcessor);
 
     // If we want to access our NodeInfo list, that has been built from all the
     // notification callbacks we received from the library, we have to do so

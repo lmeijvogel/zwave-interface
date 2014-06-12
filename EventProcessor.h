@@ -12,6 +12,7 @@ namespace MyZWave {
     public:
       EventProcessor(LightsController &lightsController, TimeService &timeService);
       void ProcessEvent(NodeInfo *nodeInfo, uint8 event);
+      void DirectTransition(Programme newState);
 
     private:
       void OnPressed();

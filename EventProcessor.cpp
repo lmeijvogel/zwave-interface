@@ -53,6 +53,10 @@ namespace MyZWave {
     TransitionTo(Programme_Off);
   }
 
+  void EventProcessor::DirectTransition(Programme newState) {
+    TransitionTo(newState);
+  }
+
   void EventProcessor::TransitionTo(Programme newState) {
     lightsController.SetProgramme(newState);
     currentState = newState;
