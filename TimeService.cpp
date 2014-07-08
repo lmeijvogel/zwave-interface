@@ -9,7 +9,7 @@ namespace MyZWave {
 
   bool TimeService::IsMorning() {
     int hour = GetHour();
-    return (6 < hour && hour < 12);
+    return (6 <= hour && hour < 12);
   }
 
   int TimeService::GetHour() {
